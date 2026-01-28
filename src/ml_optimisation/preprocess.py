@@ -1,28 +1,18 @@
 import os
 import numpy as np
 import pandas as pd
+import config
 
 # ============================================================
 # SETTINGS
 # ============================================================
 
-# Where the raw prices CSV is saved
-RAW_PATH = "data/raw/prices.csv"
-
-# Where we will save the processed ML dataset
-OUT_PATH = "data/processed/features.csv"
-
-# Stocks / ETFs we are using
-TICKERS = ["AAPL", "MSFT", "GOOG", "SPY"]
-
-# How many past days of returns we use as features
-LAGS = [1, 2, 5]
-
-# Rolling windows (in days) for mean / volatility features
-ROLL_WINDOWS = [5, 20]
-
-# Window size (in days) for the volatility target
-TARGET_VOL_WINDOW = 20
+RAW_PATH = config.RAW_PATH
+OUT_PATH = config.FEATURES_PATH
+TICKERS = config.TICKERS
+LAGS = config.LAGS
+ROLL_WINDOWS = config.ROLL_WINDOWS
+TARGET_VOL_WINDOW = config.TARGET_VOL_WINDOW
 
 
 def main():
@@ -37,7 +27,7 @@ def main():
     prices = prices[TICKERS]
 
     # rows = dates
-    # columns = AAPL, MSFT, GOOG, SPY
+    # columns = tickers
     # values = adjusted closing prices
 
     # Daily return = (price_today / price_yesterday) - 1
