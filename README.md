@@ -1,4 +1,4 @@
-# Portfolio Optimisation ML — Volatility Forecasting + Risk-Based Allocation
+# Portfolio Optimisation ML - Volatility Forecasting and Risk-Based Allocation
 
 A practical project that forecasts short-term volatility (risk) and uses it together with rolling correlations to build a covariance matrix and compute long-only portfolio weights (minimum-variance). The strategy is evaluated with walk-forward backtesting to avoid look ahead bias and data leakage.
 
@@ -61,6 +61,7 @@ Portfolio-Optimisation-ML/
 ---
 
 ## Core concepts
+This are the notes of what i learned along the way by doing the project
 
 ### Prices vs returns
 We do not model raw prices. We model returns:
@@ -71,7 +72,7 @@ returns = prices.pct_change()
 
 If price moves from 100 to 102:
 
-r = (102/100) - 1 = 0.02
+$r = (102/100) - 1 = 0.02$
 
 
 Returns are more suitable for modelling because prices are non-stationary.
