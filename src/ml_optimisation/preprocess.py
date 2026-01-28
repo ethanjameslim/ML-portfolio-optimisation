@@ -43,34 +43,23 @@ def main():
         # Take the return series for one ticker
         r = returns[ticker].rename("ret").to_frame()
 
-
-        # ----------------------------------------------------
         # LAG FEATURES (PAST RETURNS)
-        # ----------------------------------------------------
-
         for k in LAGS:
             r[f"ret_lag_{k}"] = r["ret"].shift(k)
 
-        # ----------------------------------------------------
         # ROLLING FEATURES (RECENT AVERAGE + VOLATILITY)
-        # ----------------------------------------------------
-
         for w in ROLL_WINDOWS:
             r[f"roll_mean_{w}"] = r["ret"].rolling(w).mean()
             r[f"roll_std_{w}"] = r["ret"].rolling(w).std()
 
 
-        # ----------------------------------------------------
         # TARGET: TOMORROW'S VOLATILITY
-        # ----------------------------------------------------
-
         r["target_vol"] = (
             r["ret"]
             .rolling(TARGET_VOL_WINDOW)
             .std()
             .shift(-1)
         )
-
 
         # So we know which stock each row belongs to
         r["ticker"] = ticker
@@ -93,11 +82,6 @@ def main():
     df.to_csv(OUT_PATH)
 
     print(f"Saved {len(df):,} rows to {OUT_PATH}")
-
-
-# ============================================================
-# RUN THE SCRIPT
-# ============================================================
-
+    
 if __name__ == "__main__":
     main()
