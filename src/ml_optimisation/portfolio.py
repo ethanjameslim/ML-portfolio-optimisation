@@ -162,7 +162,7 @@ def main():
     weights_df.to_csv(OUT_WEIGHTS_PATH)
 
     print(f"Saved weights to {OUT_WEIGHTS_PATH}")
-    print(weights_df.head())
+    print(weights_df.tail())
 
 if __name__ == "__main__":
     main()

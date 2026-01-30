@@ -32,7 +32,7 @@ def main():
 
     # Daily return = (price_today / price_yesterday) - 1
     # This gives percentage change per day
-    returns = prices.pct_change()
+    returns = prices.pct_change(fill_method=None)
 
     # We will build features for each ticker separately,
     # then combine them into one big dataset
