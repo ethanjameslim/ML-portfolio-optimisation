@@ -4,6 +4,12 @@ A practical project that forecasts short-term volatility (risk) and uses it toge
 
 ---
 
+
+![Equity Curve](data/processed/equity_curve.png)
+The dynamically rebalanced minimum-variance portfolio delivered more stable growth than the market benchmark by actively controlling portfolio risk. While the strategy did not always maximise raw returns, it reduced volatility and drawdowns, resulting in competitive risk-adjusted performance.
+
+This demonstrates the effectiveness of volatility-based allocation and highlights how disciplined portfolio construction can improve consistency compared to passive exposure.
+
 ## What this project does
 
 **Goal:** improve risk-adjusted performance by controlling portfolio risk.
