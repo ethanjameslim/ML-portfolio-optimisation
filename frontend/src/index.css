@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color: #111827;
+    background-color: #f4f1ea;
+    font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    @apply border-line;
+  }
+
+  body {
+    @apply min-h-screen bg-stone bg-halo text-ink;
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    @apply outline-none;
+  }
+
+  ::selection {
+    @apply bg-teal/20 text-ink;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply rounded-3xl border border-white/60 bg-white/80 shadow-card backdrop-blur;
+  }
+
+  .panel-muted {
+    @apply rounded-3xl border border-white/50 bg-white/55 shadow-card backdrop-blur;
+  }
+
+  .panel-title {
+    @apply text-sm font-semibold uppercase tracking-[0.24em] text-slate/80;
+  }
+
+  .metric-value {
+    @apply break-words font-mono text-2xl font-semibold leading-tight tracking-tight text-ink md:text-3xl;
+  }
+
+  .grid-lines {
+    background-image: linear-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.15) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+}

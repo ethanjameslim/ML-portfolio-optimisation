@@ -1,6 +1,8 @@
 import os
-import pandas as pd
+import matplotlib
+matplotlib.use('Agg')  # non-interactive backend — required when running from a thread
 import matplotlib.pyplot as plt
+import pandas as pd
 
 CURVES_PATH = "data/processed/backtest_curves.csv"
 OUT_PATH = "data/processed/equity_curve.png"

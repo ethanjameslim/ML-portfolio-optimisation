@@ -4,19 +4,25 @@ import pandas as pd
 from config import TICKERS, START_DATE, END_DATE, DATA_DIR
 
 
-def download_price_data():
+def download_price_data(tickers=None, start_date=None, end_date=None):
     """
     Download adjusted close prices for selected tickers
-    and save to data/raw/prices.csv
+    and save to data/raw/prices.csv.
+
+    Parameters override config defaults when provided.
     """
+    _tickers    = tickers    if tickers    is not None else TICKERS
+    _start_date = start_date if start_date is not None else START_DATE
+    _end_date   = end_date   if end_date   is not None else END_DATE
+
     os.makedirs(DATA_DIR, exist_ok=True)
 
-    print(f"Downloading data for {TICKERS} from {START_DATE}...")
+    print(f"Downloading data for {_tickers} from {_start_date}...")
 
     data = yf.download(
-        TICKERS,
-        start=START_DATE,
-        end=END_DATE,
+        _tickers,
+        start=_start_date,
+        end=_end_date,
         auto_adjust=True,
         progress=False
     )
