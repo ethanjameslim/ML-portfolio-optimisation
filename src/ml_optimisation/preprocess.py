@@ -15,7 +15,13 @@ ROLL_WINDOWS = config.ROLL_WINDOWS
 TARGET_VOL_WINDOW = config.TARGET_VOL_WINDOW
 
 
-def main():
+def main(tickers=None):
+    """
+    Build feature matrix from raw prices.
+
+    tickers overrides config.TICKERS when provided.
+    """
+    _tickers = tickers if tickers is not None else TICKERS
 
     # index_col=0: first column (Date) becomes the index
     # parse_dates=True: convert strings to datetime objects
@@ -24,7 +30,7 @@ def main():
     # Make sure dates are in correct time order
     prices = prices.sort_index()
 
-    prices = prices[TICKERS]
+    prices = prices[_tickers]
 
     # rows = dates
     # columns = tickers
@@ -38,7 +44,7 @@ def main():
     # then combine them into one big dataset
     rows = []
 
-    for ticker in TICKERS:
+    for ticker in _tickers:
 
         # Take the return series for one ticker
         r = returns[ticker].rename("ret").to_frame()
