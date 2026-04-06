@@ -93,8 +93,7 @@ export function EditableTickerTable({
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div>
             <p className="panel-title">Ticker Management</p>
-            <h3 className="mt-3 text-xl font-semibold text-ink">Editable ticker universe</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{tickerConfig.note}</p>
+            <h3 className="mt-3 text-xl font-semibold text-ink">Asset universe</h3>
           </div>
           <div className="rounded-2xl bg-stone-100 px-4 py-3 text-right">
             <p className="font-mono text-2xl font-semibold text-ink">{draftTickers.length}</p>

@@ -43,9 +43,6 @@ export function MetricsTable({ rows }: MetricsTableProps) {
       <div>
         <p className="panel-title">Performance Metrics</p>
         <h3 className="mt-3 text-xl font-semibold text-ink">Strategy and benchmark scorecard</h3>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
-          Backtest summary straight from the existing `backtest_summary.csv` output, formatted for quick comparison.
-        </p>
       </div>
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-stone-200">

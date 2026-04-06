@@ -8,6 +8,7 @@ import type {
   WeightsRefreshResult,
 } from '@/types/portfolio';
 
+
 function toActionError(error: unknown, fallbackTitle: string): ActionMessage {
   return {
     status: 'error',
@@ -110,18 +111,6 @@ export function usePortfolioDashboard() {
     }
   }, [applyTickerMutation]);
 
-  const runOptimisation = useCallback(async () => {
-    setBusyAction('runOptimisation');
-    try {
-      const result = await portfolioApi.runOptimisation();
-      setActionMessage(result);
-    } catch (runError) {
-      setActionMessage(toActionError(runError, 'Optimisation run failed'));
-    } finally {
-      setBusyAction(null);
-    }
-  }, []);
-
   const refreshDashboard = useCallback(async () => {
     setBusyAction('refreshDashboard');
     try {
@@ -168,7 +157,6 @@ export function usePortfolioDashboard() {
     loadDashboard,
     saveTickers,
     resetTickers,
-    runOptimisation,
     refreshDashboard,
     refreshWeights,
     refreshBacktest,

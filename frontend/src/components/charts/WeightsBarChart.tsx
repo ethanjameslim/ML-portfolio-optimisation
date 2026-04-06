@@ -22,10 +22,6 @@ export function WeightsBarChart({ allocations }: WeightsBarChartProps) {
     <div className="panel p-6">
       <div className="mb-6">
         <p className="panel-title">Weight Breakdown</p>
-        <h3 className="mt-3 text-xl font-semibold text-ink">Latest allocation bar chart</h3>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
-          Sorted by size to highlight concentration and the largest current allocations.
-        </p>
       </div>
 
       <div className="h-[340px]">

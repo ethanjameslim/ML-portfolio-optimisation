@@ -1,10 +1,7 @@
 import { useMemo, useState } from 'react';
-import { Calendar, Database, Gauge, LayoutGrid, TrendingUp } from 'lucide-react';
+import { Calendar, Database, Gauge, TrendingUp } from 'lucide-react';
 import { SidebarNav } from '@/components/SidebarNav';
 import { BacktestSummary } from '@/components/BacktestSummary';
-import { ControlPanel } from '@/components/ControlPanel';
-import { EditableTickerTable } from '@/components/EditableTickerTable';
-import { AllocationTable } from '@/components/AllocationTable';
 import { MetricsTable } from '@/components/MetricsTable';
 import { MetricCard } from '@/components/MetricCard';
 import { EquityCurveChart } from '@/components/charts/EquityCurveChart';
@@ -24,7 +21,11 @@ import { formatDateLabel, formatPercent } from '@/utils/format';
 
 const rangeOptions: RangeKey[] = ['YTD', '1Y', '3Y', 'MAX'];
 
-export function PortfolioDashboardPage() {
+interface PortfolioDashboardPageProps {
+  onRerun?: () => void;
+}
+
+export function PortfolioDashboardPage({ onRerun }: PortfolioDashboardPageProps) {
   const {
     data,
     isLoading,
@@ -32,9 +33,6 @@ export function PortfolioDashboardPage() {
     actionMessage,
     busyAction,
     loadDashboard,
-    saveTickers,
-    resetTickers,
-    runOptimisation,
     refreshDashboard,
     refreshWeights,
     refreshBacktest,
@@ -78,7 +76,7 @@ export function PortfolioDashboardPage() {
       <div className="mx-auto flex min-h-screen max-w-3xl items-center justify-center px-6">
         <div className="w-full space-y-4">
           <EmptyState
-            description="The dashboard could not load the current portfolio outputs. Use the retry button below after checking the generated data files or adapter configuration."
+            description="The dashboard could not load portfolio data. Check that the pipeline has been run and data files exist, then retry."
             title="Unable to load dashboard data"
           />
           {error ? (
@@ -99,7 +97,13 @@ export function PortfolioDashboardPage() {
   return (
     <div className="min-h-screen">
       <div className="mx-auto flex max-w-[1800px] gap-6 px-4 py-6 lg:px-6">
-        <SidebarNav adapter={data.adapter} />
+        <SidebarNav
+          busyAction={busyAction}
+          onLoadBacktest={() => void refreshBacktest()}
+          onLoadWeights={() => void refreshWeights()}
+          onRefresh={() => void refreshDashboard()}
+          onRerun={() => onRerun?.()}
+        />
 
         <main className="flex-1 space-y-6 pb-12">
           <section className="panel overflow-hidden bg-ink text-white">
@@ -112,10 +116,10 @@ export function PortfolioDashboardPage() {
                 </div>
                 <div>
                   <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">
-                    Modern front-end layer for your optimiser pipeline
+                    ML Portfolio Analytics
                   </h1>
                   <p className="mt-4 max-w-3xl text-sm leading-7 text-white/70 md:text-base">
-                    This interface sits on top of the current portfolio optimisation outputs, giving you a clean quant-style dashboard for weights, backtest analytics, ticker management, and run controls without touching the optimisation engine itself.
+                    Minimum-variance portfolio optimisation with ML volatility forecasting and walk-forward backtesting across multiple benchmark strategies.
                   </p>
                 </div>
               </div>
@@ -150,126 +154,84 @@ export function PortfolioDashboardPage() {
 
           <section className="space-y-6" id="overview">
             <SectionHeader
-              description="High-signal snapshot of the current strategy run, centered on portfolio outcomes, benchmark comparison, and the latest allocation state."
               eyebrow="Overview"
-              title="Dashboard and key metrics"
+              title="Key metrics"
             />
             <BacktestSummary summary={data.summary} />
-            <div className="grid gap-6 xl:grid-cols-[minmax(0,1.8fr)_minmax(320px,0.9fr)]">
-              <div className="space-y-4">
-                <div className="flex flex-wrap gap-2">
-                  {rangeOptions.map((option) => (
-                    <Button
-                      key={option}
-                      className="min-w-[72px]"
-                      onClick={() => setRange(option)}
-                      variant={range === option ? 'secondary' : 'ghost'}
-                    >
-                      {option}
-                    </Button>
-                  ))}
-                </div>
-                {filteredSeries.length > 0 ? (
-                  <EquityCurveChart data={filteredSeries} />
-                ) : (
-                  <EmptyState
-                    description="No backtest points are available for the selected range."
-                    title="No equity data"
-                  />
-                )}
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2">
+                {rangeOptions.map((option) => (
+                  <Button
+                    key={option}
+                    className="min-w-[72px]"
+                    onClick={() => setRange(option)}
+                    variant={range === option ? 'secondary' : 'ghost'}
+                  >
+                    {option}
+                  </Button>
+                ))}
               </div>
-
-              <AllocationTable
-                allocations={data.latestWeights.allocations}
-                limit={6}
-                subtitle={`Latest snapshot from ${formatDateLabel(data.latestWeights.date)}.`}
-                title="Recent weights preview"
-              />
+              {filteredSeries.length > 0 ? (
+                <EquityCurveChart data={filteredSeries} />
+              ) : (
+                <EmptyState
+                  description="No backtest points are available for the selected range."
+                  title="No equity data"
+                />
+              )}
             </div>
           </section>
 
-          <section className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]" id="controls">
-            <ControlPanel
-              adapter={data.adapter}
-              busyAction={busyAction}
-              onLoadBacktest={() => void refreshBacktest()}
-              onLoadWeights={() => void refreshWeights()}
-              onRefresh={() => void refreshDashboard()}
-              onRun={() => void runOptimisation()}
-            />
-            <div className="panel p-6">
-              <div>
-                <p className="panel-title">At A Glance</p>
-                <h3 className="mt-3 text-xl font-semibold text-ink">Current dashboard status</h3>
+          <div className="panel p-6">
+            <div>
+              <p className="panel-title">At A Glance</p>
+              <h3 className="mt-3 text-xl font-semibold text-ink">Current dashboard status</h3>
+            </div>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-3xl bg-stone-100 p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Backtest window</p>
+                <p className="mt-3 text-lg font-semibold text-ink">{data.summary.startDate.slice(0, 4)} – {data.summary.endDate.slice(0, 4)}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{data.backtestSeries.length} trading days in backtest.</p>
               </div>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-3xl bg-stone-100 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Adapter mode</p>
-                  <p className="mt-3 text-lg font-semibold text-ink">{data.adapter.label}</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">{data.adapter.detail}</p>
-                </div>
-                <div className="rounded-3xl bg-stone-100 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Latest update</p>
-                  <p className="mt-3 text-lg font-semibold text-ink">{formatDateLabel(data.summary.lastUpdated)}</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Use the control buttons to refresh weights or backtest outputs from the latest processed files.
-                  </p>
-                </div>
-                <div className="rounded-3xl bg-stone-100 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Ticker draft mode</p>
-                  <p className="mt-3 text-lg font-semibold text-ink">
-                    {data.tickerConfig.persistedLocally ? 'Local draft saved' : 'Backend defaults in view'}
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">{data.tickerConfig.note}</p>
-                </div>
-                <div className="rounded-3xl bg-stone-100 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Coverage</p>
-                  <p className="mt-3 text-lg font-semibold text-ink">{data.performanceRows.length} benchmark tracks</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Strategy, static min-var, equal weight, and buy-and-hold SPY are all surfaced in the summary table.
-                  </p>
-                </div>
+              <div className="rounded-3xl bg-stone-100 p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Latest update</p>
+                <p className="mt-3 text-lg font-semibold text-ink">{formatDateLabel(data.summary.lastUpdated)}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  Use the sidebar controls to refresh weights or backtest outputs from the latest processed files.
+                </p>
+              </div>
+              <div className="rounded-3xl bg-stone-100 p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Ticker draft mode</p>
+                <p className="mt-3 text-lg font-semibold text-ink">
+                  {data.tickerConfig.persistedLocally ? 'Local draft saved' : 'Backend defaults in view'}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">Ticker edits are saved locally in your browser.</p>
+              </div>
+              <div className="rounded-3xl bg-stone-100 p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Coverage</p>
+                <p className="mt-3 text-lg font-semibold text-ink">{data.performanceRows.length} benchmark tracks</p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  Strategy, static min-var, equal weight, and buy-and-hold SPY are all surfaced in the summary table.
+                </p>
               </div>
             </div>
-          </section>
+          </div>
 
-          <section className="space-y-6" id="tickers">
+<section className="space-y-6" id="weights">
             <SectionHeader
-              description="Edit the ticker universe from the UI with validation, clean table interactions, and adapter-safe save behavior."
-              eyebrow="Ticker Management"
-              title="Ticker controls"
-            />
-            <EditableTickerTable
-              isResetting={busyAction === 'resetTickers'}
-              isSaving={busyAction === 'saveTickers'}
-              onReset={() => void resetTickers()}
-              onSave={(tickers) => void saveTickers(tickers)}
-              tickerConfig={data.tickerConfig}
-            />
-          </section>
-
-          <section className="space-y-6" id="weights">
-            <SectionHeader
-              description="Multiple views of the latest portfolio weights to make concentration, diversification, and sizing decisions immediately legible."
               eyebrow="Weights"
-              title="Portfolio weights visualisation"
+              title="Portfolio weights"
             />
             <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
               <WeightsBarChart allocations={data.latestWeights.allocations} />
               <WeightsDonutChart allocations={data.latestWeights.allocations} />
             </div>
-            <AllocationTable
-              allocations={data.latestWeights.allocations}
-              subtitle={`Sorted and responsive allocation table for the latest rebalance on ${formatDateLabel(data.latestWeights.date)}.`}
-              title="Current weight allocations"
-            />
           </section>
 
           <section className="space-y-6" id="backtest">
             <SectionHeader
-              description="Backtest analytics from the current processed outputs, including drawdowns, rolling risk views, benchmark metrics, and recent rebalances."
               eyebrow="Backtest"
-              title="Backtest results and diagnostics"
+              title="Backtest results"
             />
 
             <div className="grid gap-6 xl:grid-cols-2">
@@ -295,34 +257,7 @@ export function PortfolioDashboardPage() {
 
             <MetricsTable rows={data.performanceRows} />
 
-            <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-              <div className="panel p-6">
-                <div>
-                  <p className="panel-title">Portfolio Value</p>
-                  <h3 className="mt-3 text-xl font-semibold text-ink">Portfolio value over time</h3>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    The strategy equity curve already tracks portfolio value, so the headline card below acts as a fast read for the current endpoint.
-                  </p>
-                </div>
-                <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                  <MetricCard
-                    detail="Latest equity multiple"
-                    icon={<LayoutGrid className="h-5 w-5" />}
-                    label="Portfolio Value"
-                    tone="positive"
-                    value={data.backtestSeries[data.backtestSeries.length - 1]?.strategyEquity?.toFixed(3) ?? 'N/A'}
-                  />
-                  <MetricCard
-                    detail="Current benchmark reference"
-                    icon={<TrendingUp className="h-5 w-5" />}
-                    label="SPY Equity"
-                    tone="neutral"
-                    value={data.backtestSeries[data.backtestSeries.length - 1]?.spyEquity?.toFixed(3) ?? 'N/A'}
-                  />
-                </div>
-              </div>
-
-              <div className="panel p-6">
+            <div className="panel p-6">
                 <div>
                   <p className="panel-title">Rebalance History</p>
                   <h3 className="mt-3 text-xl font-semibold text-ink">Recent rebalances</h3>
@@ -360,7 +295,6 @@ export function PortfolioDashboardPage() {
                   </table>
                 </div>
               </div>
-            </div>
           </section>
         </main>
       </div>

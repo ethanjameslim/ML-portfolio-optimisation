@@ -1,10 +1,8 @@
 import { RefreshCw, Play, BarChart3, Database } from 'lucide-react';
-import type { AdapterDescriptor } from '@/types/portfolio';
 import { Button } from '@/components/ui/Button';
 
 interface ControlPanelProps {
-  adapter: AdapterDescriptor;
-  onRun: () => void;
+  onRerun: () => void;
   onRefresh: () => void;
   onLoadWeights: () => void;
   onLoadBacktest: () => void;
@@ -12,8 +10,7 @@ interface ControlPanelProps {
 }
 
 export function ControlPanel({
-  adapter,
-  onRun,
+  onRerun,
   onRefresh,
   onLoadWeights,
   onLoadBacktest,
@@ -23,24 +20,16 @@ export function ControlPanel({
     <div className="panel p-6">
       <div className="flex flex-col gap-5">
         <div>
-          <p className="panel-title">Run / Control Panel</p>
-          <h3 className="mt-3 text-xl font-semibold text-ink">Pipeline controls and result sync</h3>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            Buttons route through the front-end adapter only. The current adapter is
-            {' '}
-            <span className="font-semibold text-ink">{adapter.label}</span>
-            .
-          </p>
+          <p className="panel-title">Controls</p>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
           <Button
             icon={<Play className="h-4 w-4" />}
-            loading={busyAction === 'runOptimisation'}
-            onClick={onRun}
+            onClick={onRerun}
             variant="primary"
           >
-            Run optimisation
+            New run
           </Button>
           <Button
             icon={<RefreshCw className="h-4 w-4" />}
@@ -68,9 +57,6 @@ export function ControlPanel({
           </Button>
         </div>
 
-        <div className="rounded-2xl bg-stone-100/80 px-4 py-3 text-sm leading-6 text-slate-600">
-          {adapter.detail}
-        </div>
       </div>
     </div>
   );
