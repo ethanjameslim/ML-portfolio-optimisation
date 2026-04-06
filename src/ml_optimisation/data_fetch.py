@@ -6,7 +6,7 @@ from config import TICKERS, START_DATE, END_DATE, DATA_DIR
 # Module for fetching raw price data from yfinance
 
 
-
+"Download prices"
 def download_price_data(tickers=None, start_date=None, end_date=None):
     """
     Download adjusted close prices for selected tickers
