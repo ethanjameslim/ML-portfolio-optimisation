@@ -13,16 +13,24 @@ jobs:
     permissions:
       contents: write
       id-token: write
+      pull-requests: read
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Update README with Claude
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           prompt: |
-            Review the recent changes merged into main and update README.md
-            to reflect any new features, changed APIs, or updated setup steps.
-            Commit the changes with the message "docs: auto-update README".
+            A PR was just merged into main. Review the changes introduced by this PR
+            (use `git diff HEAD~1 HEAD` to see what changed) and update README.md
+            if needed, following the rules in CLAUDE.md under "README Update Rules".
+
+            Only modify README.md if something observable changed (new files, new scripts,
+            changed metrics, new config params, changed run steps). If no README update
+            is needed, do nothing.
+
+            If you make changes, commit them with: git add README.md && git commit -m "docs: auto-update README"
