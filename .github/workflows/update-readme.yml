@@ -1,3 +1,5 @@
+name: Auto-update README on merge to main
+
 on:
   pull_request:
     branches:
