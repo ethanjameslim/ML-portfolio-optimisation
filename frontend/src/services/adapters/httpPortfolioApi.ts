@@ -1,19 +1,28 @@
+import {
+  computeDrawdownSeries,
+  computeRollingAnnualizedVolatility,
+  computeRollingSharpe,
+} from '@/utils/analytics';
 import type {
   ActionMessage,
   BacktestRefreshResult,
+  BacktestSeriesPoint,
   DashboardRefreshResult,
+  PipelineStatus,
   PortfolioApi,
   PortfolioDashboardData,
+  RunPipelineRequest,
   TickerMutationResult,
   WeightsRefreshResult,
 } from '@/types/portfolio';
 
 const ENDPOINTS = {
-  dashboard: '/api/portfolio/dashboard',
-  tickers: '/api/portfolio/tickers',
-  run: '/api/portfolio/run',
-  latestWeights: '/api/portfolio/weights/latest',
-  backtest: '/api/portfolio/backtest',
+  dashboard:    '/api/portfolio/dashboard',
+  tickers:      '/api/portfolio/tickers',
+  run:          '/api/portfolio/run',
+  status:       '/api/portfolio/status',
+  latestWeights:'/api/portfolio/weights/latest',
+  backtest:     '/api/portfolio/backtest',
 } as const;
 
 async function requestJson<T>(input: string, init?: RequestInit) {
@@ -44,6 +53,25 @@ function toAction(
   };
 }
 
+/**
+ * The backend always returns null for the four derived fields.
+ * Compute them client-side here, exactly as filePortfolioApi does.
+ */
+function applyAnalytics(series: BacktestSeriesPoint[]): BacktestSeriesPoint[] {
+  const strategyDrawdown  = computeDrawdownSeries(series.map((p) => p.strategyEquity));
+  const spyDrawdown       = computeDrawdownSeries(series.map((p) => p.spyEquity));
+  const rollingVolatility = computeRollingAnnualizedVolatility(series.map((p) => p.strategyReturn));
+  const rollingSharpe     = computeRollingSharpe(series.map((p) => p.strategyReturn));
+
+  return series.map((point, i) => ({
+    ...point,
+    strategyDrawdown:  strategyDrawdown[i],
+    spyDrawdown:       spyDrawdown[i],
+    rollingVolatility: rollingVolatility[i],
+    rollingSharpe:     rollingSharpe[i],
+  }));
+}
+
 /*
   Centralised frontend assumptions for future backend integration:
   - GET  /api/portfolio/dashboard returns PortfolioDashboardData
@@ -53,8 +81,9 @@ function toAction(
   - GET  /api/portfolio/backtest returns BacktestRefreshResult
 */
 export const httpPortfolioApi: PortfolioApi = {
-  getDashboardData() {
-    return requestJson<PortfolioDashboardData>(ENDPOINTS.dashboard);
+  async getDashboardData() {
+    const data = await requestJson<PortfolioDashboardData>(ENDPOINTS.dashboard);
+    return { ...data, backtestSeries: applyAnalytics(data.backtestSeries) };
   },
 
   saveTickers(tickers) {
@@ -70,10 +99,11 @@ export const httpPortfolioApi: PortfolioApi = {
     });
   },
 
-  async runOptimisation() {
+  async runOptimisation(request: RunPipelineRequest) {
     try {
       return await requestJson<ActionMessage>(ENDPOINTS.run, {
         method: 'POST',
+        body: JSON.stringify(request),
       });
     } catch (error) {
       return toAction(
@@ -84,8 +114,13 @@ export const httpPortfolioApi: PortfolioApi = {
     }
   },
 
+  getPipelineStatus(): Promise<PipelineStatus> {
+    return requestJson<PipelineStatus>(ENDPOINTS.status);
+  },
+
   async refreshDashboard() {
-    const dashboard = await this.getDashboardData();
+    const data = await requestJson<PortfolioDashboardData>(ENDPOINTS.dashboard);
+    const dashboard = { ...data, backtestSeries: applyAnalytics(data.backtestSeries) };
     return {
       dashboard,
       action: toAction('success', 'Dashboard refreshed', 'Loaded latest backend portfolio data.'),
@@ -96,7 +131,8 @@ export const httpPortfolioApi: PortfolioApi = {
     return requestJson<WeightsRefreshResult>(ENDPOINTS.latestWeights);
   },
 
-  loadBacktestData() {
-    return requestJson<BacktestRefreshResult>(ENDPOINTS.backtest);
+  async loadBacktestData() {
+    const result = await requestJson<BacktestRefreshResult>(ENDPOINTS.backtest);
+    return { ...result, backtestSeries: applyAnalytics(result.backtestSeries) };
   },
 };

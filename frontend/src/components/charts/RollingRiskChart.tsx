@@ -24,9 +24,6 @@ export function RollingRiskChart({ data, metric }: RollingRiskChartProps) {
       <div className="mb-6">
         <p className="panel-title">Rolling Risk</p>
         <h3 className="mt-3 text-xl font-semibold text-ink">{title} over time</h3>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
-          Front-end derived analytics from the saved daily return series. No backend optimisation logic is altered.
-        </p>
       </div>
 
       <div className="h-[300px]">

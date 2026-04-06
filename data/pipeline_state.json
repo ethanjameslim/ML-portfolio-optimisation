@@ -1,0 +1,20 @@
+{
+  "status": "success",
+  "stage": "Complete",
+  "progress": 100,
+  "message": "Pipeline completed successfully. Dashboard is ready.",
+  "startedAt": "2026-04-06T07:06:36.756473+00:00",
+  "completedAt": "2026-04-06T07:06:44.636173+00:00",
+  "error": null,
+  "tickers": [
+    "AAPL",
+    "MSFT",
+    "GOOG",
+    "SPY",
+    "TLT",
+    "GLD",
+    "VNQ",
+    "IWM"
+  ],
+  "startDate": "2018-01-01"
+}

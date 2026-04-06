@@ -1,20 +1,28 @@
-import { Activity, BarChart3, CandlestickChart, LayoutDashboard, ListTree, PlayCircle } from 'lucide-react';
-import type { AdapterDescriptor } from '@/types/portfolio';
+import { Activity, BarChart3, CandlestickChart, Database, LayoutDashboard, Play, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import { cn } from '@/utils/cn';
 
 const items = [
   { href: '#overview', label: 'Overview', icon: LayoutDashboard },
-  { href: '#controls', label: 'Controls', icon: PlayCircle },
-  { href: '#tickers', label: 'Tickers', icon: ListTree },
   { href: '#weights', label: 'Weights', icon: BarChart3 },
   { href: '#backtest', label: 'Backtest', icon: CandlestickChart },
 ];
 
 interface SidebarNavProps {
-  adapter: AdapterDescriptor;
+  onRerun?: () => void;
+  onRefresh?: () => void;
+  onLoadWeights?: () => void;
+  onLoadBacktest?: () => void;
+  busyAction?: string | null;
 }
 
-export function SidebarNav({ adapter }: SidebarNavProps) {
+export function SidebarNav({
+  onRerun,
+  onRefresh,
+  onLoadWeights,
+  onLoadBacktest,
+  busyAction,
+}: SidebarNavProps) {
   return (
     <aside className="hidden w-[280px] shrink-0 lg:block">
       <div className="sticky top-6 panel overflow-hidden bg-ink text-white">
@@ -27,9 +35,6 @@ export function SidebarNav({ adapter }: SidebarNavProps) {
             </div>
             <div>
               <h1 className="text-2xl font-semibold tracking-tight">Portfolio Optimiser</h1>
-              <p className="mt-3 text-sm leading-6 text-white/70">
-                Production-style analytics shell for weights, backtests, and ticker controls.
-              </p>
             </div>
           </div>
 
@@ -51,13 +56,58 @@ export function SidebarNav({ adapter }: SidebarNavProps) {
             })}
           </nav>
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/55">
-              Adapter Mode
-            </p>
-            <p className="mt-3 text-sm font-semibold text-white">{adapter.label}</p>
-            <p className="mt-2 text-sm leading-6 text-white/65">{adapter.detail}</p>
-          </div>
+          {(onRerun || onRefresh || onLoadWeights || onLoadBacktest) && (
+            <div className="space-y-3 border-t border-white/10 pt-6">
+              <p className="px-1 text-xs font-semibold uppercase tracking-[0.22em] text-white/50">
+                Controls
+              </p>
+              <div className="flex flex-col gap-2">
+                {onRerun && (
+                  <Button
+                    className="w-full justify-start"
+                    icon={<Play className="h-4 w-4" />}
+                    onClick={onRerun}
+                    variant="primary"
+                  >
+                    New run
+                  </Button>
+                )}
+                {onRefresh && (
+                  <Button
+                    className="w-full justify-start"
+                    icon={<RefreshCw className="h-4 w-4" />}
+                    loading={busyAction === 'refreshDashboard'}
+                    onClick={onRefresh}
+                    variant="secondary"
+                  >
+                    Refresh results
+                  </Button>
+                )}
+                {onLoadWeights && (
+                  <Button
+                    className="w-full justify-start"
+                    icon={<BarChart3 className="h-4 w-4" />}
+                    loading={busyAction === 'refreshWeights'}
+                    onClick={onLoadWeights}
+                    variant="ghost"
+                  >
+                    Load latest weights
+                  </Button>
+                )}
+                {onLoadBacktest && (
+                  <Button
+                    className="w-full justify-start"
+                    icon={<Database className="h-4 w-4" />}
+                    loading={busyAction === 'refreshBacktest'}
+                    onClick={onLoadBacktest}
+                    variant="ghost"
+                  >
+                    Load backtest data
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </aside>

@@ -5,4 +5,5 @@ tensorflow
 yfinance
 scipy
 matplotlib
-scipy
+fastapi
+uvicorn[standard]

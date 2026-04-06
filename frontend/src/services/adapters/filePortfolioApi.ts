@@ -9,8 +9,10 @@ import type {
   DashboardSummary,
   LatestWeightsSnapshot,
   PerformanceRow,
+  PipelineStatus,
   PortfolioApi,
   PortfolioDashboardData,
+  RunPipelineRequest,
   TickerConfig,
   TickerMutationResult,
   WeightHistoryRow,
@@ -266,12 +268,24 @@ export const filePortfolioApi: PortfolioApi = {
     } satisfies TickerMutationResult;
   },
 
-  async runOptimisation() {
+  async runOptimisation(_request: RunPipelineRequest) {
     return createAction(
       'warning',
       'Run endpoint not connected',
       'The browser cannot execute the Python optimisation pipeline directly. Wire this button to a backend POST endpoint when you expose one.',
     );
+  },
+
+  async getPipelineStatus(): Promise<PipelineStatus> {
+    return {
+      status: 'idle',
+      stage: '',
+      progress: 0,
+      message: 'Static adapter — no pipeline status available.',
+      startedAt: null,
+      completedAt: null,
+      error: null,
+    };
   },
 
   async refreshDashboard() {

@@ -20,10 +20,7 @@ export function EquityCurveChart({ data }: EquityCurveChartProps) {
     <div className="panel p-6">
       <div className="mb-6">
         <p className="panel-title">Portfolio Equity Curve</p>
-        <h3 className="mt-3 text-xl font-semibold text-ink">Strategy versus benchmarks</h3>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
-          Interactive line chart for the portfolio equity curve and benchmark comparison, using the existing backtest output as the source of truth.
-        </p>
+        <h3 className="mt-3 text-xl font-semibold text-ink">Strategy vs benchmarks</h3>
       </div>
 
       <div className="h-[360px]">

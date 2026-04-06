@@ -15,10 +15,6 @@ export function WeightsDonutChart({ allocations }: WeightsDonutChartProps) {
     <div className="panel p-6">
       <div className="mb-6">
         <p className="panel-title">Allocation Mix</p>
-        <h3 className="mt-3 text-xl font-semibold text-ink">Donut view of current weights</h3>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
-          A complementary view for concentration and diversification across the latest rebalance date.
-        </p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-center">

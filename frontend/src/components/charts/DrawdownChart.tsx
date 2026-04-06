@@ -20,10 +20,7 @@ export function DrawdownChart({ data }: DrawdownChartProps) {
     <div className="panel p-6">
       <div className="mb-6">
         <p className="panel-title">Drawdown Profile</p>
-        <h3 className="mt-3 text-xl font-semibold text-ink">Peak-to-trough stress map</h3>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
-          Strategy drawdown is filled for emphasis, with SPY included as a benchmark reference when available.
-        </p>
+        <h3 className="mt-3 text-xl font-semibold text-ink">Peak-to-trough drawdown</h3>
       </div>
 
       <div className="h-[300px]">

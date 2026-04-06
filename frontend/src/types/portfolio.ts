@@ -117,11 +117,29 @@ export interface DashboardRefreshResult {
   action: ActionMessage;
 }
 
+export type PipelineRunStatus = 'idle' | 'running' | 'success' | 'error';
+
+export interface PipelineStatus {
+  status: PipelineRunStatus;
+  stage: string;
+  progress: number;
+  message: string;
+  startedAt: string | null;
+  completedAt: string | null;
+  error: string | null;
+}
+
+export interface RunPipelineRequest {
+  tickers: string[];
+  startDate: string;
+}
+
 export interface PortfolioApi {
   getDashboardData(): Promise<PortfolioDashboardData>;
   saveTickers(tickers: string[]): Promise<TickerMutationResult>;
   resetTickers(): Promise<TickerMutationResult>;
-  runOptimisation(): Promise<ActionMessage>;
+  runOptimisation(request: RunPipelineRequest): Promise<ActionMessage>;
+  getPipelineStatus(): Promise<PipelineStatus>;
   refreshDashboard(): Promise<DashboardRefreshResult>;
   loadLatestWeights(): Promise<WeightsRefreshResult>;
   loadBacktestData(): Promise<BacktestRefreshResult>;
